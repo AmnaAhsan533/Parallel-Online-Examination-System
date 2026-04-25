@@ -1,0 +1,15 @@
+Instructions to run on linux:
+Download indexupd.html, syscorelastupdate.cpp and favicon.ico and and save in one folder.
+Open terminal in same folder
+Run indexupd.html by entering command: python3 -m http.server 8000 
+If error encountered, run command:  python -m SimpleHTTPServer 8000 
+Open another terminal in the same folder
+Compile syscorelastupdate.cpp
+Open web browser, enter http://localhost:8000
+Run syscorelastupdate.exe, refresh browser, stats will change.
+Keep refreshing browser to see exam submission progress.
+Click Enter when syscorelastupdate.exe terminal prompts
+Refresh dashboard again to view grading progress.
+Syscore will terminate, hit Ctrl+C for indexupd.html to terminate.
+
+Alternatively, use codespaces with live server to view project results without linux.
