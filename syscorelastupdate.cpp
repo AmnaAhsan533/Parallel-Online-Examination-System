@@ -12,28 +12,28 @@
 
 struct Exam {
     int student_id;
-    string student_answers;
+    std::string student_answers;
     int score;
     bool is_flagged;
-    string sub_type;
+    std::string sub_type;
 };
 
 
 int active_students = 0;
 int early_count = 0, ontime_count = 0, timeout_count = 0, flagged_count = 0;
-vector<int> final_scores;
-queue<Exam> submission_queue;
+std::vector<int> final_scores;
+std::queue<Exam> submission_queue;
 
 pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER;
 sem_t items_in_queue;
 sem_t grading_slots;
 
 thread_local int current_sid;
-const string ANSWER_KEY = "ABCDE";
+const std::string ANSWER_KEY = "ABCDE";
 
-void update_dashboard(string status) {
+void update_dashboard(std::string status) {
     pthread_mutex_lock(&mtx);
-    ofstream f("dashboard_data.json");
+    std::ofstream f("dashboard_data.json");
     double avg = final_scores.empty() ? 0 : accumulate(final_scores.begin(), final_scores.end(), 0.0) / final_scores.size();
     
     f << "{\n"
@@ -83,7 +83,7 @@ void* student_thread(void* arg) {
     if(cheating) flagged_count++;
     
     // random answers: ome get "ABCDE", some get "ABXXX"
-    string ans = (rand() % 2 == 0) ? "ABCDE" : "ABCCD"; 
+    std::string ans = (rand() % 2 == 0) ? "ABCDE" : "ABCCD"; 
     
     if(work_time < 5) early_count++; else ontime_count++;
     submission_queue.push({current_sid, ans, 0, cheating, (work_time < 10 && work_time > 4 ? "Early" : "On-Time")});
@@ -103,15 +103,15 @@ void* evaluator_thread(void* arg) {
         pthread_mutex_lock(&mtx);
         if(!submission_queue.empty()) {
             Exam e = submission_queue.front();
-	    string subtype = e.sub_type;
+	        std::string subtype = e.sub_type;
             submission_queue.pop();
             int marks = 0;
             for(int i=0; i<5; i++) {
                 if(i < e.student_answers.length() && e.student_answers[i] == ANSWER_KEY[i]) 
                     marks += 20;
             }
-	    cout << "Grading student " << e.student_id << " (Status: " << type << ")" << " (Student's Answer: " << e.student_answers << ")" << (Marks Obtained: " << marks << ")" << endl;
-	    if(e.is_flagged) { cout << "Student " << e.student_id << "may be suspected of cheating as their work_time is less than 4" << endl; } 
+	    std::cout << "Grading student " << e.student_id << " (Status: " << subtype << ")" << " (Student's Answer: " << e.student_answers << ")" << " (Marks Obtained: " << marks <<" )\n";
+	    if(e.is_flagged) { std::cout << "Student " << e.student_id << "may be suspected of cheating as their work_time is less than 4" << std::endl; } 
             final_scores.push_back(marks);
         }
         pthread_mutex_unlock(&mtx);
