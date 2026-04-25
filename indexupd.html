@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OS Exam Dashboard</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; color: white; text-align: center; }
+        .container { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; padding: 20px; }
+        .card { background: #16213e; border: 1px solid #0f3460; padding: 20px; border-radius: 12px; width: 200px; }
+        .card h3 { margin: 0; font-size: 14px; color: #add8e6; }
+        .card p { font-size: 28px; margin: 10px 0; font-weight: bold; }
+        .status-bar { background: #e94560; padding: 10px; font-weight: bold; margin-bottom: 20px; }
+        .flag { color: #ff4d4d; }
+    </style>
+</head>
+<body>
+    <div id="status" class="status-bar">Waiting for System...</div>
+    <h1>Parallel Exam Analytics</h1>
+    <div class="container">
+        <div class="card"><h3>Active Now</h3><p id="active">0</p></div>
+        <div class="card"><h3>In Queue</h3><p id="queued">0</p></div>
+        <div class="card"><h3>Early</h3><p id="early">0</p></div>
+        <div class="card"><h3>On-Time</h3><p id="ontime">0</p></div>
+        <div class="card"><h3>Timed Out</h3><p id="timeout">0</p></div>
+        <div class="card"><h3>Cheating Flags</h3><p id="flagged" class="flag">0</p></div>
+        <div class="card" style="width: 100%; max-width: 445px;">
+            <h3>Class Average Score</h3><p id="average" style="color: #4dfbaf;">0.00%</p>
+        </div>
+    </div>
+
+    <script>
+    async function update() {
+        try {
+            // adding a unique timestamp (?t=...) forces the browser to bypass its cache -> an attempt at autoupdating dashboard
+            const response = await fetch('dashboard_data.json?t=' + Date.now());
+            if (!response.ok) throw new Error("Backend file not ready");
+           
+            const d = await response.json();
+
+            // Dynamic DOM updates without refreshing
+            document.getElementById('active').innerText = d.active;
+            document.getElementById('queued').innerText = d.queued;
+            document.getElementById('early').innerText = d.early;
+            document.getElementById('ontime').innerText = d.ontime;
+            document.getElementById('timeout').innerText = d.timeout;
+            document.getElementById('flagged').innerText = d.flagged;
+            document.getElementById('average').innerText = d.average.toFixed(2) + "%";
+            document.getElementById('status').innerText = d.status;
+
+            console.log("Live Sync: Success");
+        } catch (err) {
+            console.log("Syncing...", err.message);
+        }
+    }
+
+    //update every 500ms for a "live" feel -> another update at autoupdating dashboard
+    setInterval(update, 500); 
+    
+    </script>
+</body>
+</html>   
